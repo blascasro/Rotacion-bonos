@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotación Bonos · AR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Rotación Bonos</h1>
+    <p class="subtitle">Bonos soberanos hard dollar · Argentina</p>
+  </header>
+
+  <nav class="tabs-nav">
+    <div class="tabs-container">
+      <button class="tab-btn active" data-pair="GD30/AL30">GD30/AL30</button>
+      <button class="tab-btn" data-pair="GD35/AL35">GD35/AL35</button>
+      <button class="tab-btn" data-pair="GD38/AE38">GD38/AE38</button>
+      <button class="tab-btn" data-pair="GD41/AL41">GD41/AL41</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="tab-panel active" data-panel="GD30/AL30"></div>
+    <div class="tab-panel" data-panel="GD35/AL35"></div>
+    <div class="tab-panel" data-panel="GD38/AE38"></div>
+    <div class="tab-panel" data-panel="GD41/AL41"></div>
+  </main>
+
+  <footer>
+    <p>Datos: IOL / Primary &middot; Actualizado al 25/05/2025 &middot; Creado con ❤ por BLaS</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
