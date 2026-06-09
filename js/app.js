@@ -54,6 +54,7 @@ function parseCSV(text) {
  *  Sheets may have variable-length headers/notes above the data, so we don't
  *  skip a fixed number of rows — we just look for the date pattern. */
 function parseHistorical(csvText) {
+  console.log('[CSV RAW primeras 10 lineas]', csvText.split('\n').slice(0, 10));
   const rows = csvText
     .split('\n')
     .map(r => r.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
