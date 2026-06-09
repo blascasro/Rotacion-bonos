@@ -50,19 +50,26 @@ function parseCSV(text) {
     .map(line => line.split(',').map(c => c.replace(/^"|"$/g, '').trim()));
 }
 
-/** Historical sheets: newest-first → we reverse → chronological */
+/** Historical sheets: detect data rows by date format in col 0 (d/m or dd/mm).
+ *  Sheets may have variable-length headers/notes above the data, so we don't
+ *  skip a fixed number of rows — we just look for the date pattern. */
 function parseHistorical(csvText) {
-  return parseCSV(csvText)
-    .slice(2)                     // skip header row + separator row
-    .filter(r => r[0] && r.length >= 4)
-    .reverse()
-    .map(r => ({
-      d:  r[0],
-      b1: parseFloat(r[1]),
-      b2: parseFloat(r[2]),
-      r:  parseFloat(r[3].replace('%', '')),
-    }))
-    .filter(d => !isNaN(d.b1) && !isNaN(d.b2) && !isNaN(d.r));
+  const rows = csvText
+    .split('\n')
+    .map(r => r.split(',').map(c => c.trim().replace(/^"|"$/g, '')));
+
+  const data = [];
+  for (const cols of rows) {
+    if (!/^\d{1,2}\/\d{1,2}$/.test(cols[0])) continue;
+    const b1    = parseFloat(cols[1]);
+    const b2    = parseFloat(cols[2]);
+    const ratio = parseFloat((cols[3] || '').replace('%', '').replace(',', '.'));
+    if (isNaN(b1) || isNaN(b2) || isNaN(ratio)) continue;
+    data.push({ d: cols[0], b1, b2, r: ratio });
+  }
+
+  // CSV comes newest-first → reverse to chronological order for charting
+  return data.reverse();
 }
 
 /** Intraday sheet: newest-first → reverse → chronological */
