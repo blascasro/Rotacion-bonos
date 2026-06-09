@@ -92,15 +92,24 @@ async function fetchCSV(gid) {
    Bollinger Bands
    ========================================================= */
 function computeBollinger(ratios, period, devs) {
+  const n = ratios.length;
   return ratios.map((r, i) => {
-    if (i < period - 1) return { mm: null, upper: null, lower: null, signal: 'Neutro' };
-    const chunk = ratios.slice(i - period + 1, i + 1);
-    const mm = chunk.reduce((s, v) => s + v, 0) / period;
-    const variance = chunk.reduce((s, v) => s + (v - mm) ** 2, 0) / period;
-    const sigma = Math.sqrt(variance);
-    const upper = mm + devs * sigma;
-    const lower = mm - devs * sigma;
-    const signal = r >= upper ? 'GD' : r <= lower ? 'AL' : 'Neutro';
+    if (i < period - 1) {
+      // Not enough history for a full window.
+      // Exception: if the whole dataset is shorter than 'period', still
+      // compute the last point using all available data so renderCards
+      // always has a value to display.
+      if (i < n - 1) return { mm: null, upper: null, lower: null, signal: 'Neutro' };
+      // i === n-1 AND n < period → fall through with partial window
+    }
+    const chunk = ratios.slice(Math.max(0, i - period + 1), i + 1);
+    const ep       = chunk.length;                                        // actual elements used
+    const mm       = chunk.reduce((s, v) => s + v, 0) / ep;
+    const variance = chunk.reduce((s, v) => s + (v - mm) ** 2, 0) / ep;
+    const sigma    = Math.sqrt(variance);
+    const upper    = mm + devs * sigma;
+    const lower    = mm - devs * sigma;
+    const signal   = r >= upper ? 'GD' : r <= lower ? 'AL' : 'Neutro';
     return { mm, upper, lower, signal };
   });
 }
@@ -268,10 +277,13 @@ function renderCards(pairKey, lastData, lastBoll) {
   const el  = document.getElementById(`cards-${sid}`);
   if (!el) return;
   const { b1, b2 } = PAIR_INFO[pairKey];
-  const { signal, mm, upper, lower } = lastBoll;
-  const r  = lastData.r;
-  const sc = signalColor(signal);
-  const sl = signalLabel(signal);
+  const r = lastData.r;
+
+  // Guard: lastBoll can be null/undefined when there are not enough data points
+  const { signal = null, mm = null, upper = null, lower = null } = lastBoll ?? {};
+  const hasSignal = signal !== null;
+  const sc = hasSignal ? signalColor(signal) : '#6b7280';
+  const sl = hasSignal ? signalLabel(signal) : 'Sin datos suficientes';
 
   el.innerHTML = `
     <div class="card">
@@ -562,6 +574,7 @@ async function fetchAndRenderIntraday() {
   try {
     const text = await fetchCSV(GID.INTRADAY);
     const rows = parseIntraday(text);
+    console.log(`[INTRADAY] CSV recibido → ${rows.length} filas válidas`);
     state.intradayData = rows;
 
     if (rows.length === 0) {
@@ -613,7 +626,9 @@ function loadPair(pairKey) {
   showLoading(pairKey);
   fetchCSV(GID[pairKey])
     .then(text => {
-      state.data[pairKey] = parseHistorical(text);
+      const parsed = parseHistorical(text);
+      console.log(`[${pairKey}] CSV recibido → ${parsed.length} filas válidas`);
+      state.data[pairKey] = parsed;
       /* If this tab is active (or was already switched to), render immediately */
       if (state.activePair === pairKey) {
         if (!state.initialized[pairKey]) initPanel(pairKey);
