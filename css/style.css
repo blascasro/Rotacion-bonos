@@ -363,6 +363,86 @@ main {
 }
 
 /* =========================================================
+   Loading / Error states
+   ========================================================= */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  color: var(--text-2);
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.error-state {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.error-title {
+  color: var(--red);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-detail {
+  font-size: 0.78rem;
+  color: var(--text-2);
+}
+
+/* =========================================================
+   Intraday section
+   ========================================================= */
+.intraday-section {
+  margin-top: 2.25rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+
+.refresh-indicator {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.refresh-dot        { font-size: 0.55rem; }
+.refresh-dot.ok  { color: var(--green); }
+.refresh-dot.err { color: var(--red); }
+
+.intraday-chart-wrap {
+  height: 322px; /* 300px canvas + 22px padding */
+}
+
+/* =========================================================
    Footer
    ========================================================= */
 footer {
